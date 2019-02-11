@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<base target="_top">
+	<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+	<style>
+			:root {
+				--mdc-theme-primary: #188038;
+			}
+		</style>
+</head>
+
+<body>
+	<div id="app">
+		<div>
+			<h2>シートの追加</h2>
+			<p>入力用シートを追加します。</p>
+			<button class="mdc-button mdc-button--unelevated" @click="addSheet">
+				<span class="mdc-button__label">追加</span>
+			</button>
+		</div>
+		<div>
+			<h2>カレンダー情報更新</h2>
+			<p>
+				カレンダー一覧情報を更新します。<br>
+				カレンダーを新規作成したときなどに実行してください。
+			</p>
+			<button class="mdc-button mdc-button--unelevated" @click="updateCalendarList">
+				<span class="mdc-button__label">更新</span>
+			</button>
+		</div>
+		<div>
+			<h2>予定一括登録</h2>
+			<p>入力した予定を一括登録します。</p>
+			<button class="mdc-button mdc-button--unelevated" @click="generateEvents">
+				<span class="mdc-button__label">登録</span>
+			</button>
+		</div>
+	</div>
+	<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script>
+		window.mdc.autoInit();
+		var app = new Vue({
+			el: '#app',
+			data: {
+				calendars: null,
+				selectedCal: null,
+			},
+			mounted: function () {
+				google.script.run.withSuccessHandler(function (cals) {
+					this.calendars = cals;
+				}.bind(this)).getCalendarList();
+				google.script.run.withSuccessHandler(function (id) {
+					this.selectedCal = id;
+				}.bind(this)).getSelectedCalId();
+			},
+			methods: {
+				addSheet: function () {
+					google.script.run
+						.withSuccessHandler(function (sheetName) {
+							google.script.run.showModal(
+								'シート作成完了',
+								'<p>入力用シート「' + sheetName + '」を作成しました。<br>追加したい予定を入力してください。</p>',
+								300,
+								100
+							);
+						})
+						.withFailureHandler(function () {
+							google.script.run.showModal(
+								'シート作成失敗',
+								'<p>シートが作成できませんでした。</p>',
+								300,
+								100
+							);
+						})
+						.addSheet()
+				},
+				updateCalendarList: function () {
+					google.script.run
+						.withSuccessHandler(function () {
+							google.script.run.showModal(
+								'カレンダー一覧更新完了',
+								'<p>カレンダー一覧の更新が完了しました</p>',
+								300,
+								100
+							);
+						})
+						.withFailureHandler(function () {
+							google.script.run.showModal(
+								'カレンダー一覧情報更新失敗',
+								'<p>カレンダー一覧情報の更新に失敗しました。<br>もう一度試してみてください。</p>',
+								300,
+								100
+							);
+						})
+						.updateCalendarList()
+				},
+				generateEvents: function () {
+					google.script.run
+						.withSuccessHandler(function (result) {
+							google.script.run.showModal(
+								'予定登録完了',
+								'<p>' + result + '件の予定を追加しました。</p>',
+								300,
+								100
+							);
+						})
+						.withFailureHandler(function () {
+							google.script.run.showModal(
+								'予定登録失敗',
+								'<p>予定の登録を実行しました。<br>登録先カレンダーや、値の書式を確認してください。</p>',
+								300,
+								100
+							);
+						})
+						.generateEvents()
+				}
+			},
+		})
+	</script>
+</body>
+
+</html>
