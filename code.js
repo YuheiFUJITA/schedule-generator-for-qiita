@@ -39,7 +39,7 @@ function showSidebar() {
 function addSheet() {
 	var ss = SpreadsheetApp.getActiveSpreadsheet();
 	//現在のスプレッドシートにテンプレートをコピー
-	var sheet = SpreadsheetApp.openById(SS_Id).getSheetByName('template').copyTo(ss);
+	var sheet = SpreadsheetApp.openById(SS_ID).getSheetByName('template').copyTo(ss);
 	sheet.activate();
 	updateCalendarList();
 	return sheet.getName();
